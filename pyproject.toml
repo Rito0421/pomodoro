@@ -3,7 +3,7 @@ requires = ["setuptools>=45", "wheel", "setuptools_scm[toml]>=6.2"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "pomodoro-timer-cli"
+name = "pomodoro-multiplatform"
 version = "1.0.0"
 description = "A simple cross-platform Pomodoro timer with desktop notifications"
 readme = "README.md"

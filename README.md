@@ -23,7 +23,7 @@ A simple cross-platform Pomodoro timer. Manage work and break cycles with notifi
 Requires Python 3.8 or higher.
 
 ```bash
-pip install pomodoro-timer-cli
+pip install pomodoro-multiplatform
 ```
 
 Then run:
