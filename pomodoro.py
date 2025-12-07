@@ -12,7 +12,9 @@ import argparse
 import platform
 import subprocess
 import time
+from contextlib import redirect_stderr
 from datetime import datetime
+from io import StringIO
 
 try:
     from plyer import notification  # type: ignore
@@ -28,8 +30,11 @@ def notify(title: str, message: str) -> None:
 
     if HAS_PLYER:
         # Use plyer for cross-platform notifications
+        # Suppress stderr to hide internal plyer import errors
+        stderr_buffer = StringIO()
         try:
-            notification.notify(title=title, message=message, app_name="Pomodoro", timeout=5)
+            with redirect_stderr(stderr_buffer):
+                notification.notify(title=title, message=message, app_name="Pomodoro", timeout=5)
             notification_sent = True
         except Exception:
             # Plyer failed, try fallback
