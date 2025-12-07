@@ -23,6 +23,13 @@ dist/
 .coverage
 htmlcov/
 
+# Linting / Type checking
+.mypy_cache/
+.ruff_cache/
+.pytype/
+.dmypy.json
+dmypy.json
+
 # OS
 .DS_Store
 Thumbs.db
