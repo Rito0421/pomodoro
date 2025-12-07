@@ -24,31 +24,34 @@ except ImportError:
 
 def notify(title: str, message: str) -> None:
     """Fire a desktop notification (cross-platform)."""
+    notification_sent = False
+
     if HAS_PLYER:
         # Use plyer for cross-platform notifications
         try:
-            notification.notify(
-                title=title, message=message, app_name="Pomodoro", timeout=5
-            )
+            notification.notify(title=title, message=message, app_name="Pomodoro", timeout=5)
+            notification_sent = True
         except Exception:
+            # Plyer failed, try fallback
             pass
-    elif platform.system() == "Darwin":
-        # macOS fallback using osascript
-        script = f'''
-            display notification "{message}" with title "{title}"
-            tell application "System Events"
-                activate
-            end tell
-        '''
-        try:
-            subprocess.run(
-                ["osascript", "-e", script], check=False, capture_output=True
-            )
-        except Exception:
-            pass
-    else:
-        # Fallback: print to console
-        print(f"\n[{title}] {message}")
+
+    # Fallback if plyer not available or failed
+    if not notification_sent:
+        if platform.system() == "Darwin":
+            # macOS fallback using osascript
+            script = f'''
+                display notification "{message}" with title "{title}"
+                tell application "System Events"
+                    activate
+                end tell
+            '''
+            try:
+                subprocess.run(["osascript", "-e", script], check=False, capture_output=True)
+            except Exception:
+                pass
+        else:
+            # Fallback: print to console
+            print(f"\n[{title}] {message}")
 
     # Play sound
     try:
@@ -79,9 +82,7 @@ def wait_for_user_confirmation(message: str) -> bool:
         script = f'''
             display dialog "{message}" buttons {{"Quit", "Start Next"}} default button 2
         '''
-        result = subprocess.run(
-            ["osascript", "-e", script], capture_output=True, text=True
-        )
+        result = subprocess.run(["osascript", "-e", script], capture_output=True, text=True)
         return "Start Next" in result.stdout
     else:
         # Windows/Linux: use console input
@@ -108,9 +109,7 @@ def countdown(label: str, seconds: int) -> None:
             remaining = int(end_at - time.time())
             if remaining <= 0:
                 break
-            print(
-                f"{label}: {format_minutes(remaining)} remaining", end="\r", flush=True
-            )
+            print(f"{label}: {format_minutes(remaining)} remaining", end="\r", flush=True)
             time.sleep(1)
     finally:
         print()
@@ -125,9 +124,7 @@ def run_pomodoro(work: int, short_break: int, long_break: int, long_every: int) 
         if session % long_every == 0:
             countdown("Long break", long_break)
             # Wait for user confirmation after long break
-            if not wait_for_user_confirmation(
-                "Long break finished! Ready for next session?"
-            ):
+            if not wait_for_user_confirmation("Long break finished! Ready for next session?"):
                 notify("Pomodoro", "Session ended")
                 print("Session ended. Good work!")
                 return
